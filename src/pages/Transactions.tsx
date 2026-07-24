@@ -1,0 +1,17 @@
+import { Download, Edit3, Plus, Search, Trash2 } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Modal } from '../components/Modal'
+import { TransactionForm } from '../components/TransactionForm'
+import { useFinance } from '../context/FinanceContext'
+import { brl, shortDate } from '../lib/format'
+import type { Transaction } from '../types'
+
+export function Transactions() {
+  const { transactions, removeTransaction, categories } = useFinance(); const [open, setOpen] = useState(false); const [editing,setEditing]=useState<Transaction>(); const [query,setQuery]=useState(''); const [type,setType]=useState('all'); const [category,setCategory]=useState('all')
+  const filtered = useMemo(()=>transactions.filter(t => (type==='all'||t.type===type) && (category==='all'||t.category===category) && `${t.description} ${t.category}`.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>b.date.localeCompare(a.date)),[transactions,query,type,category])
+  function exportCsv(){ const rows=[['Data','Descrição','Categoria','Conta','Tipo','Valor'],...filtered.map(t=>[t.date,t.description,t.category,t.account,t.type,String(t.amount)])]; const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(';')).join('\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'})); a.download='transacoes-organiza.csv'; a.click() }
+  return <><div className="page-head"><div><p className="eyebrow">Histórico completo</p><h1>Transações</h1><p>Registre, pesquise e organize todos os movimentos.</p></div><div className="head-actions"><button className="btn secondary" onClick={exportCsv}><Download size={17}/>Exportar</button><button className="btn primary" onClick={()=>{setEditing(undefined);setOpen(true)}}><Plus size={18}/>Nova transação</button></div></div>
+  <section className="card"><div className="filters"><div className="search-box"><Search size={18}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar transação..."/></div><select value={type} onChange={e=>setType(e.target.value)}><option value="all">Todos os tipos</option><option value="income">Receitas</option><option value="expense">Despesas</option></select><select value={category} onChange={e=>setCategory(e.target.value)}><option value="all">Todas as categorias</option>{categories.map(c=><option key={c}>{c}</option>)}</select></div>
+  <div className="table-wrap"><table><thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Conta</th><th>Valor</th><th></th></tr></thead><tbody>{filtered.map(t=><tr key={t.id}><td>{shortDate(t.date)}</td><td><strong>{t.description}</strong>{t.note&&<small>{t.note}</small>}</td><td><span className="tag">{t.category}</span></td><td>{t.account}</td><td><strong className={t.type}>{t.type==='income'?'+':'-'} {brl.format(t.amount)}</strong></td><td><div className="row-actions"><button className="icon-btn" onClick={()=>{setEditing(t);setOpen(true)}}><Edit3 size={16}/></button><button className="icon-btn danger" onClick={()=>confirm('Excluir esta transação?')&&removeTransaction(t.id)}><Trash2 size={16}/></button></div></td></tr>)}</tbody></table>{!filtered.length&&<div className="empty">Nenhuma transação encontrada.</div>}</div></section>
+  {open&&<Modal title={editing?'Editar transação':'Nova transação'} onClose={()=>setOpen(false)}><TransactionForm initial={editing} onDone={()=>setOpen(false)}/></Modal>}</>
+}
