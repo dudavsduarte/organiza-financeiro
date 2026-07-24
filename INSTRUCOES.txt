@@ -1,0 +1,22 @@
+CORREÇÃO DO BUILD DO ORGANIZA FINANCEIRO
+
+1. Extraia este ZIP.
+2. Copie as pastas/arquivos extraídos para dentro da pasta organiza-financeiro.
+3. Quando o macOS/VS Code perguntar, escolha substituir os arquivos existentes.
+4. O arquivo .env não é alterado por esta correção.
+5. No terminal do projeto, execute:
+
+   npm run build
+
+6. Se aparecer ✓ built, envie ao GitHub:
+
+   git add .
+   git commit -m "Corrige build da Vercel"
+   git push origin main
+
+Arquivos corrigidos:
+- src/vite-env.d.ts
+- src/pages/Dashboard.tsx
+- src/pages/Reports.tsx
+- tsconfig.app.json
+- tsconfig.node.json

@@ -4,7 +4,15 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true
+    "target": "ES2022",
+    "lib": [
+      "ES2022"
+    ],
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "vite.config.ts"
+  ]
 }
